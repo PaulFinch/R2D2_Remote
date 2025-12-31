@@ -16,8 +16,18 @@ UUID_CMD: str = "0000fff1-0000-1000-8000-00805f9b34fb"
 UUID_NOTIFY: str = "0000fff2-0000-1000-8000-00805f9b34fb"
 
 SCAN_TIMEOUT: float = 5.0
-LOOP_PERIOD: float = 0.25
+LOOP_PERIOD: float = 0.20
+LOOP_COUNT: int = 10
 AXIS_THRESHOLD: float = 0.5
+
+BUTTON_SND_1: int = 0       # SOUND 1
+BUTTON_SND_2: int = 1       # SOUND 2
+BUTTON_SND_3: int = 2       # SOUND 3
+BUTTON_SND_4: int = 3       # SOUND 4
+BUTTON_HEAD_LEFT: int = 4   # TURN HEAD LEFT
+BUTTON_HEAD_RIGHT: int = 5  # TURN HEAD RIGHT
+BUTTON_LED_BLUE: int = 6    # TOGGLE BLUE LED
+BUTTON_LED_RED: int = 7     # TOGGLE RED LED
 
 P00: int = 0xB5
 P12: int = 0x7C
@@ -32,14 +42,14 @@ NUL: int = 0x00
 
 @dataclass
 class ControlState:
-    snd: int = 0x00     # SOUND
-    mt1: int = 0x00     # MOTOR 1
-    sp1: int = 0x00     # MOTOR 1 SPEED
-    mt2: int = 0x00     # MOTOR 2
-    sp2: int = 0x00     # MOTOR 2 SPEED
-    hed: int = 0x14     # HEAD POSITION
-    ldb: int = 0x00     # BLUE LED
-    ldr: int = 0x00     # RED LED
+    snd: int = 0x00         # SOUND
+    mt1: int = 0x00         # MOTOR 1
+    sp1: int = 0x00         # MOTOR 1 SPEED
+    mt2: int = 0x00         # MOTOR 2
+    sp2: int = 0x00         # MOTOR 2 SPEED
+    hed: int = 0x14         # HEAD POSITION
+    ldb: int = 0x00         # BLUE LED
+    ldr: int = 0x00         # RED LED
 
     def reset(self) -> None:
         self.mt1 = self.mt2 = 0x00
@@ -77,42 +87,52 @@ async def send_payload(client: BleakClient, payload: bytes) -> None:
 def update_from_joystick(state: ControlState, joy: pygame.joystick.Joystick) -> None:
     state.reset()
 
-    x: float = joy.get_axis(0)
-    y: float = joy.get_axis(1)
+    if joy.get_numaxes() >= 2:
+        x: float = joy.get_axis(0)
+        y: float = joy.get_axis(1)
 
-    if y < -AXIS_THRESHOLD:
-        state.mt1 = state.mt2 = 0x01
-    elif y > AXIS_THRESHOLD:
-        state.mt1 = state.mt2 = 0x02
-    elif x < -AXIS_THRESHOLD:
-        state.mt1 = 0x02
-        state.mt2 = 0x01
-    elif x > AXIS_THRESHOLD:
-        state.mt1 = 0x01
-        state.mt2 = 0x02
+        if y < -AXIS_THRESHOLD:
+            state.mt1 = state.mt2 = 0x01
+        elif y > AXIS_THRESHOLD:
+            state.mt1 = state.mt2 = 0x02
+        elif x < -AXIS_THRESHOLD:
+            state.mt1 = 0x02
+            state.mt2 = 0x01
+        elif x > AXIS_THRESHOLD:
+            state.mt1 = 0x01
+            state.mt2 = 0x02
 
-    if joy.get_button(0):
-        state.snd = 0x0A
+    if joy.get_numbuttons() >= (BUTTON_SND_1 + 1):
+        if joy.get_button(BUTTON_SND_1):
+            state.snd = 0x0A
     
-    if joy.get_button(1):
-        state.snd = 0x08
+    if joy.get_numbuttons() >= (BUTTON_SND_2 + 1):
+        if joy.get_button(BUTTON_SND_2):
+            state.snd = 0x08
     
-    if joy.get_button(2):
-        state.snd = 0x09
-    
-    if joy.get_button(3):
-        state.snd = 0x05
+    if joy.get_numbuttons() >= (BUTTON_SND_3 + 1):
+        if joy.get_button(BUTTON_SND_3):
+            state.snd = 0x09
 
-    if joy.get_button(4):
-        state.hed = 0x04
-    elif joy.get_button(5):
-        state.hed = 0x24
+    if joy.get_numbuttons() >= (BUTTON_SND_4 + 1):
+        if joy.get_button(BUTTON_SND_4):
+            state.snd = 0x05
 
-    if joy.get_button(6):
-        state.ldb ^= 0x01
+    if joy.get_numbuttons() >= (BUTTON_HEAD_LEFT + 1):
+        if joy.get_button(BUTTON_HEAD_LEFT):
+            state.hed = 0x04
 
-    if joy.get_button(7):
-        state.ldr ^= 0x01
+    if joy.get_numbuttons() >= (BUTTON_HEAD_RIGHT + 1):
+        if joy.get_button(BUTTON_HEAD_RIGHT):
+                state.hed = 0x24
+
+    if joy.get_numbuttons() >= (BUTTON_LED_BLUE + 1):
+        if joy.get_button(BUTTON_LED_BLUE):
+            state.ldb ^= 0x01
+
+    if joy.get_numbuttons() >= (BUTTON_LED_RED + 1):
+        if joy.get_button(BUTTON_LED_RED):
+            state.ldr ^= 0x01
 
 async def main() -> None:
     print("[R2D2 CONTROLLER]")
@@ -125,16 +145,12 @@ async def main() -> None:
     pygame.joystick.init()
 
     print("- Searching for joypad...")
-    if pygame.joystick.get_count() == 0:
+    if pygame.joystick.get_count() > 0:
+        joy = pygame.joystick.Joystick(0)
+        joy.init()
+        print(f"- Joypad detected: {joy.get_name()}")
+    else:
         print("ERROR: No joypad detected")
-        return
-
-    joy = pygame.joystick.Joystick(0)
-    joy.init()
-
-    print(f"- Joypad detected: {joy.get_name()}")
-    if joy.get_numaxes() < 2 or joy.get_numbuttons() < 8:
-        print("ERROR: Joypad requires at least 2 axes and 8 buttons")
         return
 
     print(f"- Searching for {TARGET_NAME}...")
@@ -156,11 +172,22 @@ async def main() -> None:
     print("- Connected")
     state = ControlState()
 
+    last_payload: bytes | None = None
+    iterations_since_send: int = 0
+
     try:
         while not stop_event.is_set():
             pygame.event.pump()
             update_from_joystick(state, joy)
-            await send_payload(client, state.to_payload())
+
+            payload = state.to_payload()
+            iterations_since_send += 1
+
+            if payload != last_payload or iterations_since_send >= LOOP_COUNT:
+                await send_payload(client, payload)
+                last_payload = payload
+                iterations_since_send = 0
+
             await asyncio.sleep(LOOP_PERIOD)
     finally:
         try:
