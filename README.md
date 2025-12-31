@@ -14,22 +14,22 @@ This script allows to control the robot with a physical gamepad.
 # Payload
 This is the bluetooth payload I figured out:
 | 0    | 1       | 2   | 3        | 4       | 5        | 6        | 7      | 8   | 9   | 10         | 11        | 12                 |
-|------|---------|-----|----------|---------|----------|----------|--------|-----|-----|------------|-----------|--------------------|
+|:----:|:-------:|:---:|:--------:|:-------:|:--------:|:--------:|:------:|:---:|:---:|:----------:|:---------:|:------------------:|
 | `b5` | `SOUND` | `?` | `MOTOR1` | `SPEED` | `MOTOR2` | `SPEED2` | `HEAD` | `?` | `?` | `BLUE LED` | `RED LED` | `7c6b5a4938271605` |
 
 # Button Assignments
 This is the current button assignments:
 
-| ID | ACTION          |
-|:--:|:---------------:|
-| 0  | SOUND 1         |
-| 1  | SOUND 2         |
-| 2  | SOUND 3         |
-| 3  | SOUND 4         |
-| 4  | TURN HEAD LEFT  |
-| 5  | TURN HEAD RIGHT |
-| 6  | TOGGLE BLUE LED |
-| 7  | TOGGLE RED LED  |
+| ID | ACTION            |
+|:--:|:-----------------:|
+| 0  | `SOUND 1`         |
+| 1  | `SOUND 2`         |
+| 2  | `SOUND 3`         |
+| 3  | `SOUND 4`         |
+| 4  | `TURN HEAD LEFT`  |
+| 5  | `TURN HEAD RIGHT` |
+| 6  | `TOGGLE BLUE LED` |
+| 7  | `TOGGLE RED LED`  |
 
 If you need to remap the buttons, just change button IDs in the following variables:
 ```
