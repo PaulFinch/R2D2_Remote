@@ -11,6 +11,14 @@ This script allows to control the robot with a physical gamepad.
 - Python >= 3.7
 - Pyton Modules: bleak, pygame
 
+# Payload
+This is the bluetooth payload I figured out:
+
+|    |       |      |        |        |        |        |      |      |      |             |         |                  |
+|----|-------|------|--------|--------|--------|--------|------|------|------|-------------|---------|------------------|
+| b5 | _XX_  | _XX_ | _XX_   | _XX_   | _XX_   | _XX_   | _XX_ | _XX_ | _XX_ | _XX_        | _XX_    | 7c6b5a4938271605 |
+|    | SOUND |      | MOTOR1 | SPEED1 | MOTOR2 | SPEED2 | HEAD |      |      | BLUE LED    | RED LED |                  |
+
 # Button Assignments
 | ID | ACTION          |
 |:--:|:---------------:|
