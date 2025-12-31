@@ -161,7 +161,7 @@ async def main() -> None:
         print("ERROR: R2D2 not found")
         return
 
-    print(f"- R2D2 detected")
+    print("- R2D2 detected")
     print(f"- Connecting to {address}...")
 
     client = BleakClient(address)
