@@ -102,35 +102,37 @@ def update_from_joystick(state: ControlState, joy: pygame.joystick.Joystick) -> 
             state.mt1 = 0x01
             state.mt2 = 0x02
 
-    if joy.get_numbuttons() >= (BUTTON_SND_1 + 1):
+    buttons: int = joy.get_numbuttons()
+
+    if buttons > BUTTON_SND_1:
         if joy.get_button(BUTTON_SND_1):
             state.snd = 0x0A
     
-    if joy.get_numbuttons() >= (BUTTON_SND_2 + 1):
+    if buttons > BUTTON_SND_2:
         if joy.get_button(BUTTON_SND_2):
             state.snd = 0x08
     
-    if joy.get_numbuttons() >= (BUTTON_SND_3 + 1):
+    if buttons > BUTTON_SND_3:
         if joy.get_button(BUTTON_SND_3):
             state.snd = 0x09
 
-    if joy.get_numbuttons() >= (BUTTON_SND_4 + 1):
+    if buttons > BUTTON_SND_4:
         if joy.get_button(BUTTON_SND_4):
             state.snd = 0x05
 
-    if joy.get_numbuttons() >= (BUTTON_HEAD_LEFT + 1):
+    if buttons > BUTTON_HEAD_LEFT:
         if joy.get_button(BUTTON_HEAD_LEFT):
             state.hed = 0x04
 
-    if joy.get_numbuttons() >= (BUTTON_HEAD_RIGHT + 1):
+    if buttons > BUTTON_HEAD_RIGHT:
         if joy.get_button(BUTTON_HEAD_RIGHT):
                 state.hed = 0x24
 
-    if joy.get_numbuttons() >= (BUTTON_LED_BLUE + 1):
+    if buttons > BUTTON_LED_BLUE:
         if joy.get_button(BUTTON_LED_BLUE):
             state.ldb ^= 0x01
 
-    if joy.get_numbuttons() >= (BUTTON_LED_RED + 1):
+    if buttons > BUTTON_LED_RED:
         if joy.get_button(BUTTON_LED_RED):
             state.ldr ^= 0x01
 
