@@ -48,3 +48,5 @@ BUTTON_LED_RED: int = 7
 pip install -r requirements.txt
 python r2d2.py
 ```
+
+`Ctrl-C` to stop.
