@@ -14,10 +14,8 @@ This script allows to control the robot with a physical gamepad.
 # Payload
 This is the bluetooth payload I figured out:
 
-|    |       |      |        |        |        |        |      |      |      |             |         |                  |
-|----|-------|------|--------|--------|--------|--------|------|------|------|-------------|---------|------------------|
-| b5 | _XX_  | _XX_ | _XX_   | _XX_   | _XX_   | _XX_   | _XX_ | _XX_ | _XX_ | _XX_        | _XX_    | 7c6b5a4938271605 |
-|    | SOUND |      | MOTOR1 | SPEED1 | MOTOR2 | SPEED2 | HEAD |      |      | BLUE LED    | RED LED |                  |
+|----|-------|--|--------|-------|--------|--------|------|--|--|-------- -|---------|------------------|
+| b5 | SOUND |  | MOTOR1 | SPEED | MOTOR2 | SPEED2 | HEAD |  |  | BLUE LED | RED LED | 7c6b5a4938271605 |
 
 # Button Assignments
 | ID | ACTION          |
