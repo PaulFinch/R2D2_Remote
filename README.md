@@ -28,8 +28,8 @@ This is the current button assignments:
 | 3  | `SOUND 4`         |
 | 4  | `TURN HEAD LEFT`  |
 | 5  | `TURN HEAD RIGHT` |
-| 6  | `TOGGLE BLUE LED` |
-| 7  | `TOGGLE RED LED`  |
+| 6  | `CYCLE BLUE LED`  |
+| 7  | `CYCLE RED LED`   |
 
 If you need to remap the buttons, just change button IDs in the following variables:
 ```

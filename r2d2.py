@@ -132,12 +132,10 @@ def update_from_joystick(state: ControlState, joy: pygame.joystick.Joystick) -> 
 
     if buttons > BUTTON_LED_BLUE:
         if joy.get_button(BUTTON_LED_BLUE):
-            #state.ldb ^= 0x01
             state.ldb = LED_SEQ[(LED_SEQ.index(state.ldb) + 1) % len(LED_SEQ)]
 
     if buttons > BUTTON_LED_RED:
         if joy.get_button(BUTTON_LED_RED):
-            #state.ldr ^= 0x01
             state.ldr = LED_SEQ[(LED_SEQ.index(state.ldr) + 1) % len(LED_SEQ)]
 
 async def main() -> None:
