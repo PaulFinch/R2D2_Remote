@@ -20,16 +20,18 @@ This is the bluetooth payload I figured out:
 # Button Assignments
 This is the current button assignments:
 
-| ID | ACTION            |
-|:--:|:-----------------:|
-| 0  | `SOUND 1`         |
-| 1  | `SOUND 2`         |
-| 2  | `SOUND 3`         |
-| 3  | `SOUND 4`         |
-| 4  | `TURN HEAD LEFT`  |
-| 5  | `TURN HEAD RIGHT` |
-| 6  | `CYCLE BLUE LED`  |
-| 7  | `CYCLE RED LED`   |
+AXIS(0): MOVE ROBOT
+
+| ID | ACTION              |
+|:--:|:-------------------:|
+| 0  | `SOUND 1`           |
+| 1  | `SOUND 2`           |
+| 2  | `SOUND 3`           |
+| 3  | `SOUND 4`           |
+| 4  | `ROTATE HEAD LEFT`  |
+| 5  | `ROTATE HEAD RIGHT` |
+| 6  | `CYCLE BLUE LED`    |
+| 7  | `CYCLE RED LED`     |
 
 If you need to remap the buttons, just change button IDs in the following variables:
 ```
