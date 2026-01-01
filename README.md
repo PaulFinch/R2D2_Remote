@@ -6,13 +6,13 @@ This script allows to control the robot with a physical gamepad.
 
 # Requirements:
 - Clementoni R2D2 Robot
-- Joystick/Gamepad (Tested with a Buffalo SNES Gamepad)
+- Joystick/Gamepad (Tested with USB Buffalo SNES Gamepad)
 - Bluetooth connectivity
 - Python >= 3.7
-- Pyton Modules: bleak, pygame
+- Pyton Modules: `bleak`, `pygame`
 
 # Payload
-This is the bluetooth payload I figured out:
+This is the bluetooth payload I managed to figure out:
 | 0    | 1       | 2   | 3        | 4       | 5        | 6        | 7      | 8   | 9   | 10         | 11        | 12-19              |
 |:----:|:-------:|:---:|:--------:|:-------:|:--------:|:--------:|:------:|:---:|:---:|:----------:|:---------:|:------------------:|
 | `b5` | `SOUND` | `?` | `MOTOR1` | `SPEED` | `MOTOR2` | `SPEED2` | `HEAD` | `?` | `?` | `BLUE LED` | `RED LED` | `7c6b5a4938271605` |
