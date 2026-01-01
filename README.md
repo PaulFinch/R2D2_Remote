@@ -23,6 +23,7 @@ This is the bluetooth payload I managed to figure out:
 This is the current button assignments:
 
 AXIS(0) and AXIS(1): `MOVE ROBOT`
+
 AXIS(3): `MOVE HEAD`
 
 BUTTONS:
