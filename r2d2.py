@@ -19,7 +19,7 @@ UUID_NOTIFY: str = "0000fff2-0000-1000-8000-00805f9b34fb"
 SCAN_TIMEOUT: float = 5.0
 LOOP_PERIOD: float = 0.20
 LOOP_COUNT: int = 10
-AXIS_THRESHOLD: float = 0.7
+AXIS_THRESHOLD: float = 0.75
 
 BUTTON_SND_1: int = 0
 BUTTON_SND_2: int = 1
@@ -90,7 +90,7 @@ async def find_device_by_name(name: str) -> Optional[str]:
 async def send_payload(client: BleakClient, payload: bytes) -> None:
     await client.write_gatt_char(UUID_CMD, payload, response=False)
 
-def map_head_axis(axis_value: float, gamma: float = 2.0, center: int = 0x14, left_min: int = 0x04, right_max: int = 0x24, deadzone: float = 0.05) -> int:
+def map_head_axis(axis_value: float, gamma: float = 2.0, center: int = 0x14, left_min: int = 0x00, right_max: int = 0x28, deadzone: float = 0.05) -> int:
     axis_value = max(-1.0, min(1.0, axis_value))
 
     if abs(axis_value) < deadzone:
