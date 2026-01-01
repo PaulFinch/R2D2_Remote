@@ -8,7 +8,7 @@ This script allows to control the robot with a physical gamepad.
 
 # Requirements:
 - Clementoni R2D2 Robot
-- Joystick/Gamepad (Tested with PS5 Controller and Buffalo SNES Gamepad)
+- USB Joystick/Gamepad (Tested with PS5 Controller and Buffalo SNES Gamepad)
 - Bluetooth connectivity
 - Python >= 3.7
 - Pyton Modules: `bleak`, `pygame`
@@ -22,14 +22,14 @@ This is the bluetooth payload I managed to figure out:
 # Button Assignments
 This is the current button assignments:
 
-AXIS(0): MOVE ROBOT
+AXIS(0): `MOVE ROBOT`
 
 | ID | ACTION              |
 |:--:|:-------------------:|
-| 0  | `SOUND 1`           |
-| 1  | `SOUND 2`           |
-| 2  | `SOUND 3`           |
-| 3  | `SOUND 4`           |
+| 0  | `PLAY SOUND 1`      |
+| 1  | `PLAY SOUND 2`      |
+| 2  | `PLAY SOUND 3`      |
+| 3  | `PLAY SOUND 4`      |
 | 4  | `ROTATE HEAD LEFT`  |
 | 5  | `ROTATE HEAD RIGHT` |
 | 6  | `CYCLE BLUE LED`    |
