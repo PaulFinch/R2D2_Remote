@@ -20,7 +20,7 @@ This is the bluetooth payload I managed to figure out:
 | `b5` | `SOUND` | `?` | `MOTOR1` | `SPEED` | `MOTOR2` | `SPEED2` | `HEAD` | `?` | `?` | `BLUE LED` | `RED LED` | `7c6b5a4938271605` |
 
 # Button Assignments
-This is the current button assignments:
+This is the current control assignments:
 
 AXIS(0) and AXIS(1): `MOVE ROBOT`
 
