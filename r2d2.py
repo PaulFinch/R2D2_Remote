@@ -29,6 +29,8 @@ BUTTON_HEAD_RIGHT: int = 5
 BUTTON_LED_BLUE: int = 6
 BUTTON_LED_RED: int = 7
 
+LED_SEQ = [0x00, 0x01, 0x02, 0x03]
+
 P00: int = 0xB5
 P12: int = 0x7C
 P13: int = 0x6B
@@ -126,15 +128,17 @@ def update_from_joystick(state: ControlState, joy: pygame.joystick.Joystick) -> 
 
     if buttons > BUTTON_HEAD_RIGHT:
         if joy.get_button(BUTTON_HEAD_RIGHT):
-                state.hed = 0x24
+            state.hed = 0x24
 
     if buttons > BUTTON_LED_BLUE:
         if joy.get_button(BUTTON_LED_BLUE):
-            state.ldb ^= 0x01
+            #state.ldb ^= 0x01
+            state.ldb = LED_SEQ[(LED_SEQ.index(state.ldb) + 1) % len(LED_SEQ)]
 
     if buttons > BUTTON_LED_RED:
         if joy.get_button(BUTTON_LED_RED):
-            state.ldr ^= 0x01
+            #state.ldr ^= 0x01
+            state.ldr = LED_SEQ[(LED_SEQ.index(state.ldr) + 1) % len(LED_SEQ)]
 
 async def main() -> None:
     print("[R2D2 CONTROLLER]")
