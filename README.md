@@ -24,6 +24,8 @@ This is the current button assignments:
 
 AXIS(0): `MOVE ROBOT`
 
+BUTTONS:
+
 | ID | ACTION              |
 |:--:|:-------------------:|
 | 0  | `PLAY SOUND 1`      |
