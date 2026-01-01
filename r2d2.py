@@ -42,7 +42,7 @@ P18: int = 0x16
 P19: int = 0x05
 NUL: int = 0x00
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%H:%M:%S")
+logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s", datefmt="%H:%M:%S")
 
 @dataclass
 class ControlState:
