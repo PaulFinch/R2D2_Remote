@@ -41,14 +41,14 @@ BUTTONS:
 
 If you need to remap the buttons, just change button IDs in the following variables:
 ```
-BUTTON_SND_1            0
-BUTTON_SND_2            1
-BUTTON_SND_3            2
-BUTTON_SND_4            3
-BUTTON_HEAD_LEFT        4
-BUTTON_HEAD_RIGHT       5
-BUTTON_LED_BLUE         6
-BUTTON_LED_RED          7
+BUTTON_SND_1
+BUTTON_SND_2
+BUTTON_SND_3
+BUTTON_SND_4
+BUTTON_HEAD_LEFT
+BUTTON_HEAD_RIGHT
+BUTTON_LED_BLUE
+BUTTON_LED_RED
 ```
 
 # Use the script
