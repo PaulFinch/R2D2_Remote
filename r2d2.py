@@ -7,6 +7,7 @@ import sys
 import math
 import logging
 from dataclasses import dataclass
+from typing import Optional
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
 import pygame
 from bleak import BleakClient, BleakScanner
@@ -43,6 +44,7 @@ P19: int = 0x05
 NUL: int = 0x00
 
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s", datefmt="%H:%M:%S")
+logger = logging.getLogger("R2D2")
 
 @dataclass
 class ControlState:
@@ -160,7 +162,6 @@ def update_from_joystick(state: ControlState, joy: pygame.joystick.Joystick) -> 
             state.ldr = LED_SEQ[(LED_SEQ.index(state.ldr) + 1) % len(LED_SEQ)]
 
 async def main() -> None:
-    logger = logging.getLogger("R2D2")
     logger.info("[R2D2 CONTROLLER]")
 
     stop_event = asyncio.Event()
@@ -213,18 +214,27 @@ async def main() -> None:
             iterations_since_send = 0
 
             while not stop_event.is_set() and not disconnected.is_set():
-                pygame.event.pump()
-                update_from_joystick(state, joy)
+                try:
+                    pygame.event.pump()
+                    update_from_joystick(state, joy)
 
-                payload = state.to_payload()
-                iterations_since_send += 1
+                    payload = state.to_payload()
+                    iterations_since_send += 1
 
-                if payload != last_payload or iterations_since_send >= LOOP_COUNT:
-                    await send_payload(client, payload)
-                    last_payload = payload
-                    iterations_since_send = 0
+                    if payload != last_payload or iterations_since_send >= LOOP_COUNT:
+                        await send_payload(client, payload)
+                        last_payload = payload
+                        iterations_since_send = 0
 
-                await asyncio.sleep(LOOP_PERIOD)
+                    await asyncio.sleep(LOOP_PERIOD)
+
+                except asyncio.CancelledError:
+                    logger.info("Cancelled")
+                    raise
+
+        except asyncio.CancelledError:
+            logger.info("Cancelled")
+            break
 
         except Exception as e:
             logger.error("Error %s: %s", type(e).__name__, e)
