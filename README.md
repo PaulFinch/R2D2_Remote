@@ -1,6 +1,8 @@
 # Clementoni R2D2 Remote Controller
 This is a controller for the Clementoni R2D2 Robot.
 
+![Clementoni R2D2](r2d2.webp)
+
 The robot is originally controlled by the Official App.
 This script allows to control the robot with a physical gamepad.
 
