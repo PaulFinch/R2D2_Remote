@@ -8,7 +8,7 @@ This script allows to control the robot with a physical gamepad.
 
 # Requirements:
 - Clementoni R2D2 Robot
-- Joystick/Gamepad (Tested with USB Buffalo SNES Gamepad)
+- Joystick/Gamepad (Tested with PS5 Controller and Buffalo SNES Gamepad)
 - Bluetooth connectivity
 - Python >= 3.7
 - Pyton Modules: `bleak`, `pygame`

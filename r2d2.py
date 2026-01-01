@@ -4,10 +4,10 @@ import asyncio
 import os
 import signal
 import sys
+import math
+import logging
 from dataclasses import dataclass
-
 os.environ["PYGAME_HIDE_SUPPORT_PROMPT"] = "1"
-
 import pygame
 from bleak import BleakClient, BleakScanner
 
@@ -18,7 +18,7 @@ UUID_NOTIFY: str = "0000fff2-0000-1000-8000-00805f9b34fb"
 SCAN_TIMEOUT: float = 5.0
 LOOP_PERIOD: float = 0.20
 LOOP_COUNT: int = 10
-AXIS_THRESHOLD: float = 0.5
+AXIS_THRESHOLD: float = 0.7
 
 BUTTON_SND_1: int = 0
 BUTTON_SND_2: int = 1
@@ -41,6 +41,8 @@ P17: int = 0x27
 P18: int = 0x16
 P19: int = 0x05
 NUL: int = 0x00
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%H:%M:%S")
 
 @dataclass
 class ControlState:
@@ -86,10 +88,26 @@ async def find_device_by_name(name: str) -> Optional[str]:
 async def send_payload(client: BleakClient, payload: bytes) -> None:
     await client.write_gatt_char(UUID_CMD, payload, response=False)
 
+def map_head_axis(axis_value: float, gamma: float = 2.0, center: int = 0x14, left_min: int = 0x04, right_max: int = 0x24, deadzone: float = 0.05) -> int:
+    axis_value = max(-1.0, min(1.0, axis_value))
+
+    if abs(axis_value) < deadzone:
+        return center
+
+    sign = 1 if axis_value > 0 else -1
+    shaped = sign * (abs(axis_value) ** gamma)
+
+    if shaped < 0:
+        span = center - left_min
+    else:
+        span = right_max - center
+
+    return int(round(center + shaped * span))
+
 def update_from_joystick(state: ControlState, joy: pygame.joystick.Joystick) -> None:
     state.reset()
 
-    if joy.get_numaxes() >= 2:
+    if joy.get_numaxes() > 1:
         x: float = joy.get_axis(0)
         y: float = joy.get_axis(1)
 
@@ -103,6 +121,9 @@ def update_from_joystick(state: ControlState, joy: pygame.joystick.Joystick) -> 
         elif x > AXIS_THRESHOLD:
             state.mt1 = 0x01
             state.mt2 = 0x02
+
+    if joy.get_numaxes() > 3:
+        state.hed = map_head_axis(joy.get_axis(3))
 
     buttons: int = joy.get_numbuttons()
 
@@ -139,7 +160,8 @@ def update_from_joystick(state: ControlState, joy: pygame.joystick.Joystick) -> 
             state.ldr = LED_SEQ[(LED_SEQ.index(state.ldr) + 1) % len(LED_SEQ)]
 
 async def main() -> None:
-    print("[R2D2 CONTROLLER]")
+    logger = logging.getLogger("R2D2")
+    logger.info("[R2D2 CONTROLLER]")
 
     stop_event = asyncio.Event()
     loop = asyncio.get_running_loop()
@@ -148,60 +170,76 @@ async def main() -> None:
     pygame.init()
     pygame.joystick.init()
 
-    print("- Searching for joypad...")
-    if pygame.joystick.get_count() > 0:
-        joy = pygame.joystick.Joystick(0)
-        joy.init()
-        print(f"- Joypad detected: {joy.get_name()}")
-    else:
-        print("ERROR: No joypad detected")
+    logger.info("Searching for joypad...")
+    if pygame.joystick.get_count() == 0:
+        logger.error("No joypad detected")
         return
 
-    print(f"- Searching for {TARGET_NAME}...")
-    address = await find_device_by_name(TARGET_NAME)
-    if address is None:
-        print("ERROR: R2D2 not found")
-        return
+    joy = pygame.joystick.Joystick(0)
+    joy.init()
+    logger.info("Joypad detected: %s", joy.get_name())
 
-    print("- R2D2 detected")
-    print(f"- Connecting to {address}...")
-
-    client = BleakClient(address)
-    await client.connect()
-
-    if not client.is_connected:
-        print("ERROR: BLE connection failed")
-        return
-
-    print("- Connected")
-    state = ControlState()
-
-    last_payload: bytes | None = None
-    iterations_since_send: int = 0
-
-    try:
-        while not stop_event.is_set():
-            pygame.event.pump()
-            update_from_joystick(state, joy)
-
-            payload = state.to_payload()
-            iterations_since_send += 1
-
-            if payload != last_payload or iterations_since_send >= LOOP_COUNT:
-                await send_payload(client, payload)
-                last_payload = payload
-                iterations_since_send = 0
-
-            await asyncio.sleep(LOOP_PERIOD)
-    finally:
+    while not stop_event.is_set():
         try:
-            print()
-            await asyncio.shield(client.disconnect())
-        except (asyncio.CancelledError, EOFError):
-            pass
+            logger.info("Scanning for: %s", TARGET_NAME)
 
-    print("Bye.")
-    return
+            address = await find_device_by_name(TARGET_NAME)
+
+            if address is None:
+                await asyncio.sleep(2)
+                continue
+
+            logger.info("Found R2D2 at: %s", address)
+            logger.info("Connecting...")
+
+            disconnected = asyncio.Event()
+
+            def on_disconnect(_: BleakClient):
+                logger.info("BLE Disconnected")
+                disconnected.set()
+
+            client = BleakClient(address, disconnected_callback=on_disconnect)
+            await client.connect()
+
+            if not client.is_connected:
+                logger.error("BLE connection failed")
+                await asyncio.sleep(2)
+                continue
+
+            logger.info("Connected")
+
+            state = ControlState()
+            last_payload: bytes | None = None
+            iterations_since_send = 0
+
+            while not stop_event.is_set() and not disconnected.is_set():
+                pygame.event.pump()
+                update_from_joystick(state, joy)
+
+                payload = state.to_payload()
+                iterations_since_send += 1
+
+                if payload != last_payload or iterations_since_send >= LOOP_COUNT:
+                    await send_payload(client, payload)
+                    last_payload = payload
+                    iterations_since_send = 0
+
+                await asyncio.sleep(LOOP_PERIOD)
+
+        except Exception as e:
+            logger.error("Error %s: %s", type(e).__name__, e)
+
+        finally:
+            try:
+                if 'client' in locals() and client.is_connected:
+                    logger.info("Disconnecting...")
+                    await asyncio.shield(client.disconnect())
+            except Exception:
+                pass
+
+        await asyncio.sleep(1)
+
+    logger.info("Bye.")
 
 if __name__ == "__main__":
     asyncio.run(main())
